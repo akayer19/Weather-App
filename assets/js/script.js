@@ -39,15 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // Function to convert temperature from Celsius to Fahrenheit
-    function celsiusToFahrenheit(celsius) {
-        return (celsius * 9/5) + 32; // Conversion formula
+    // Function to convert temperature from Kelvin to Fahrenheit and round to the nearest whole number
+    function kelvinToFahrenheit(kelvin) {
+        const celsius = kelvin - 273.15; // Convert Kelvin to Celsius
+        return Math.round((celsius * 9/5) + 32); // Convert Celsius to Fahrenheit and round it
     }
 
     // Function to display weather information on the page
     function displayWeather(weatherData) {
         const currentConditions = weatherData.list[0]; // Get the current weather conditions
-        const currentTempFahrenheit = celsiusToFahrenheit(currentConditions.main.temp); // Convert the temperature to Fahrenheit
+        const currentTempFahrenheit = kelvinToFahrenheit(currentConditions.main.temp); // Convert the temperature to Fahrenheit and round it
         const weatherIconCode = currentConditions.weather[0].icon; // Get the icon code for the current weather
         const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIconCode}.png`; // Construct the URL for the weather icon
 
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${weatherIconUrl}" alt="Weather Icon">
             </div>
             <div class="current-weather-details">
-                <p>Temperature: ${currentTempFahrenheit.toFixed(2)} °F</p>
+                <p>Temperature: ${currentTempFahrenheit} °F</p>
                 <p>Humidity: ${currentConditions.main.humidity}%</p>
                 <p>Wind Speed: ${currentConditions.wind.speed} m/s</p>
             </div>
@@ -80,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dateSet.add(forecastDate); // Add the date to the set
                 dayCount++; // Increment the count of unique days
 
-                const forecastTempFahrenheit = celsiusToFahrenheit(forecast.main.temp); // Convert the temperature
+                const forecastTempFahrenheit = kelvinToFahrenheit(forecast.main.temp); // Convert the temperature and round it
                 const forecastIconCode = forecast.weather[0].icon; // Get the icon code
                 const forecastIconUrl = `http://openweathermap.org/img/wn/${forecastIconCode}.png`; // Construct the icon URL
 
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayBox.innerHTML = `
                     <p>${forecastDate}</p>
                     <img src="${forecastIconUrl}" alt="Weather Icon">
-                    <p>Temperature: ${forecastTempFahrenheit.toFixed(2)} °F</p>
+                    <p>Temperature: ${forecastTempFahrenheit} °F</p>
                     <p>Humidity: ${forecast.main.humidity}%</p>
                     <p>Wind Speed: ${forecast.wind.speed} m/s</p>
                 `;

@@ -5,23 +5,23 @@ body {
     background-color: #eaeaea;
 }
 #dashboardHeader {
-    background-color: #007BFF; /* Dark blue background */
-    color: white; /* White text */
-    text-align: center; /* Center the text */
-    padding: 10px 0; /* Add some padding above and below the text */
-    font-size: 24px; /* Increase the font size */
-    font-weight: bold; /* Make the text bold */
+    background-color: #007BFF; 
+    color: white; 
+    text-align: center; 
+    padding: 10px 0;
+    font-size: 24px; 
+    font-weight: bold; 
 }
 
 #app {
     display: flex;
     justify-content: center;
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 20px auto;
 }
 
 #leftColumn {
-    flex: 1; /* Left column takes up 1 part */
+    flex: 1; 
     margin: 10px;
     background-color: white;
     border-radius: 10px;
@@ -30,7 +30,7 @@ body {
 }
 
 #rightColumn {
-    flex: 5; /* Right column takes up 5 parts */
+    flex: 5; 
     margin: 10px;
     background-color: white;
     border-radius: 10px;
@@ -79,9 +79,9 @@ body {
 
 .current-weather-header {
     display: flex;
-    align-items: center; /* Vertically centers the items in the container */
-    margin-bottom: 20px; /* Adds margin at the bottom */
-    gap: 10px; /* Adds space between flex items */
+    align-items: center; 
+    margin-bottom: 20px; 
+    gap: 10px;
 }
 
 .current-weather-details {
@@ -90,15 +90,15 @@ body {
 
 .forecast-container {
     display: flex;
-    justify-content: space-around; /* Adjusted for equal spacing */
+    justify-content: space-around; 
     align-items: center;
-    flex-wrap: wrap; /* Prevent wrapping */
-    gap: 10px; /* Adjusted for equal spacing */
+    flex-wrap: wrap; 
+    gap: 10px; 
 }
 
 .dayBox {
-    flex: 1; /* Each box will flexibly fill the container */
-    max-width: calc(20% - 10px); /* Max width for each box */
+    flex: 1; 
+    max-width: calc(20% - 10px); 
     background-color: #007BFF;
     color: white;
     padding: 15px;
@@ -119,8 +119,8 @@ body {
     }
 
     .dayBox {
-        max-width: none; /* Reset max-width on smaller screens */
-        width: 100%; /* Full width on smaller screens */
+        max-width: none; 
+        width: 100%;
         margin-top: 10px;
     }
 }
