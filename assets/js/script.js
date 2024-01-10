@@ -1,125 +1,115 @@
 // Wait for the DOM to be fully loaded before executing the script
 document.addEventListener('DOMContentLoaded', () => {
-    // OpenWeatherMap API key for making requests
-    const apiKey = '6b7e84ac645512e9524f0cd62a24521e';
+    // Store the API key for OpenWeatherMap API
+    const apiKey = '6b7e84ac645512e9524f0cd62a24521e'; // Replace with your actual API key
 
-    // Get references to HTML elements using their IDs
-    const searchForm = document.getElementById('searchForm'); // Form element
-    const cityInput = document.getElementById('cityInput'); // Input field
-    const searchHistory = document.getElementById('searchHistory'); // Search history element
-    const currentWeather = document.getElementById('currentWeather');   // Current weather element
-    const futureWeather = document.getElementById('futureWeather'); // Future weather element
+    // Get references to various elements on the page
+    const searchForm = document.getElementById('searchForm'); // The form element for city search
+    const cityInput = document.getElementById('cityInput'); // The input field for the city name
+    const searchHistory = document.getElementById('searchHistory'); // The container for search history
+    const currentWeather = document.getElementById('currentWeather'); // The container for displaying current weather
+    const futureWeather = document.getElementById('futureWeather'); // The container for displaying the 5-day forecast
 
-    // Event listener for form submission
-    searchForm.addEventListener('submit', (event) => {  
-        event.preventDefault(); 
-        // Get the trimmed value of the input field
-        const cityName = cityInput.value.trim(); 
-        // Check if the city name is not empty
+    // Attach an event listener to the search form to handle the submit event
+    searchForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent the form from submitting in the traditional way
+        const cityName = cityInput.value.trim(); // Get and trim the city name from the input field
         if (cityName !== '') {
-            // Call the searchWeather function with the city name
-            searchWeather(cityName);
+            searchWeather(cityName); // Initiate a weather search for the entered city name
         }
     });
 
     // Function to search weather by city name
     function searchWeather(cityName) {
-        // Use OpenWeatherMap Geo API to get latitude and longitude
+        // Fetch the geographical coordinates for the given city name
         fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${apiKey}`)
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the response as JSON
             .then(data => {
-                const { lat, lon } = data[0];
-                // Use latitude and longitude to get current and future weather
+                const { lat, lon } = data[0]; // Destructure latitude and longitude from the response
+                // Fetch weather data using the obtained latitude and longitude
                 return fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`);
             })
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the second response as JSON
             .then(data => {
-                // Call the displayWeather function with the fetched data
-                displayWeather(data);
-                // Add the city to the search history
-                addToSearchHistory(cityName);
-                addToSearchHistory(data.city.name)
+                displayWeather(data); // Display the weather data on the page
+                addToSearchHistory(cityName); // Add the city to the search history
             })
             .catch(error => {
-                console.error('Error fetching weather data:', error);
+                console.error('Error fetching weather data:', error); // Log any errors to the console
             });
     }
 
-// Function to display weather information
-// Function to convert Celsius to Fahrenheit
-function celsiusToFahrenheit(celsius) {
-    return (celsius * 9/5) + 32;
-}
+    // Function to convert temperature from Celsius to Fahrenheit
+    function celsiusToFahrenheit(celsius) {
+        return (celsius * 9/5) + 32; // Conversion formula
+    }
 
-// Function to display weather information
-function displayWeather(weatherData) {
-    // Display current weather
-    const currentConditions = weatherData.list[0];
-    // Convert the current temperature from Celsius to Fahrenheit
-    const currentTempFahrenheit = celsiusToFahrenheit(currentConditions.main.temp);
-    
-    // Extract the icon code from the current weather conditions
-    const weatherIconCode = currentConditions.weather[0].icon;
+    // Function to display weather information on the page
+    function displayWeather(weatherData) {
+        const currentConditions = weatherData.list[0]; // Get the current weather conditions
+        const currentTempFahrenheit = celsiusToFahrenheit(currentConditions.main.temp); // Convert the temperature to Fahrenheit
+        const weatherIconCode = currentConditions.weather[0].icon; // Get the icon code for the current weather
+        const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIconCode}.png`; // Construct the URL for the weather icon
 
-    // Construct the URL for the weather icon
-    const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIconCode}.png`;
+        // Update the inner HTML of the currentWeather element to display the current weather
+        currentWeather.innerHTML = `
+            <div class="current-weather-header">
+                <h2>${weatherData.city.name}</h2>
+                <p>${new Date(currentConditions.dt * 1000).toLocaleDateString()}</p>
+                <img src="${weatherIconUrl}" alt="Weather Icon">
+            </div>
+            <div class="current-weather-details">
+                <p>Temperature: ${currentTempFahrenheit.toFixed(2)} °F</p>
+                <p>Humidity: ${currentConditions.main.humidity}%</p>
+                <p>Wind Speed: ${currentConditions.wind.speed} m/s</p>
+            </div>
+        `;
 
-    // Update the HTML content of the currentWeather element with weather information and icon
-    currentWeather.innerHTML = `<h2>${weatherData.city.name}</h2>
-                                 <p>Date: ${currentConditions.dt_txt}</p>
-                                    <img src="${weatherIconUrl}" alt="Weather Icon">
-                                 <p>Temperature: ${currentTempFahrenheit.toFixed(2)} °F</p>
-                                 <p>Humidity: ${currentConditions.main.humidity}%</p>
-                                 <p>Wind Speed: ${currentConditions.wind.speed} m/s</p>`;
+        // Prepare the container for the 5-day forecast
+        futureWeather.innerHTML = '<h3>5-Day Forecast:</h3><div class="forecast-container"></div>';
+        const forecastContainer = futureWeather.querySelector('.forecast-container');
 
-    // Display future weather (5-day forecast)
-    futureWeather.innerHTML = '<h3>5-Day Forecast</h3>';
+        let dayCount = 0; // Counter to track the number of days processed
+        const dateSet = new Set(); // Set to store unique dates
 
-    // Keep track of distinct days to avoid duplicates
-    const displayedDays = new Set();
+        for (let i = 0; i < weatherData.list.length && dayCount < 5; i++) {
+            const forecast = weatherData.list[i];
+            const forecastDate = new Date(forecast.dt_txt).toLocaleDateString(); // Format the date
 
-    // Iterate over all forecast entries
-    for (let i = 1; i < weatherData.list.length; i++) {
-        const forecast = weatherData.list[i];
-        const forecastDate = new Date(forecast.dt_txt).toLocaleDateString();
-        // Convert the forecast temperature from Celsius to Fahrenheit
-        const forecastTempFahrenheit = celsiusToFahrenheit(forecast.main.temp);
+            if (!dateSet.has(forecastDate)) { // Check if this date is already processed
+                dateSet.add(forecastDate); // Add the date to the set
+                dayCount++; // Increment the count of unique days
 
-        // Extract the icon code from the forecast weather conditions
-        const forecastIconCode = forecast.weather[0].icon;
+                const forecastTempFahrenheit = celsiusToFahrenheit(forecast.main.temp); // Convert the temperature
+                const forecastIconCode = forecast.weather[0].icon; // Get the icon code
+                const forecastIconUrl = `http://openweathermap.org/img/wn/${forecastIconCode}.png`; // Construct the icon URL
 
-        // Construct the URL for the forecast weather icon
-        const forecastIconUrl = `http://openweathermap.org/img/wn/${forecastIconCode}.png`;
-
-        // Check if the forecast date has not been displayed yet
-        if (!displayedDays.has(forecastDate)) {
-            // Update the HTML content with weather information for the distinct day and icon
-            futureWeather.innerHTML += `<div>
-                                           <p>Date: ${forecast.dt_txt}</p>
-                                           <img src="${forecastIconUrl}" alt="Weather Icon">
-                                        <p>Temperature: ${forecastTempFahrenheit.toFixed(2)} °F</p>
-                                           <p>Humidity: ${forecast.main.humidity}%</p>
-                                           <p>Wind Speed: ${forecast.wind.speed} m/s</p>
-                                       </div>`;
-            // Add the forecast date to the set of displayed days
-            displayedDays.add(forecastDate);
+                // Create a div element for the forecast and set its content
+                const dayBox = document.createElement('div');
+                dayBox.className = 'dayBox';
+                dayBox.innerHTML = `
+                    <p>${forecastDate}</p>
+                    <img src="${forecastIconUrl}" alt="Weather Icon">
+                    <p>Temperature: ${forecastTempFahrenheit.toFixed(2)} °F</p>
+                    <p>Humidity: ${forecast.main.humidity}%</p>
+                    <p>Wind Speed: ${forecast.wind.speed} m/s</p>
+                `;
+                forecastContainer.appendChild(dayBox); // Append the forecast box to the container
+            }
         }
     }
-}
-    // Function to add city to search history
-    function addToSearchHistory(cityName) {
-        // Check if the city already exists in the search history
-        const existingCity = Array.from(searchHistory.children).find(item => item.textContent === cityName);
 
-        if (!existingCity) {
-            // City does not exist, add it to the search history
-            const historyItem = document.createElement('div');
-            historyItem.textContent = cityName;
-            historyItem.addEventListener('click', () => {
-                // When history item is clicked, search for weather for that city
-                searchWeather(cityName);
+    // Function to add a city to the search history
+    function addToSearchHistory(cityName) {
+        // Check if the city is already in the search history to avoid duplication
+        const existingCity = Array.from(searchHistory.children).find(item => item.textContent === cityName);
+        if (!existingCity) { // If the city is not already in the history
+            const historyItem = document.createElement('div'); // Create a new div for the history item
+            historyItem.textContent = cityName; // Set the text content to the city name
+            historyItem.addEventListener('click', () => { // Add a click event listener
+                searchWeather(cityName); // Re-search the weather for this city when clicked
             });
-            searchHistory.appendChild(historyItem);
+            searchHistory.appendChild(historyItem); // Append the new history item to the search history container
         }
     }
 });

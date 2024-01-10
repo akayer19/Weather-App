@@ -4,29 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
-    <link rel="stylesheet" href="./assets/style/styles.css">
+    <link rel="stylesheet" href="./assets/style/styles.css"> <!-- Ensure the CSS file path is correct -->
+    <script src="./assets/js/script.js"></script> <!-- Ensure the JS file path is correct -->
 </head>
 <body>
+    <header id="dashboardHeader">Weather Dashboard</header>
     <div id="app">
-        <div id="searchContainer">
-            <div id="searchBar">
+        <div id="leftColumn">
+            <div id="searchContainer">
                 <form id="searchForm">
                     <input type="text" id="cityInput" placeholder="Enter city name" required>
                     <button type="submit" id="searchButton">Search</button>
                 </form>
             </div>
-            <hr>
-            <div id="searchHistory"></div>
+            <div id="searchHistory">
+                <!-- Search History will be populated here -->
+            </div>
         </div>
-        <div id="currentWeather"></div>
-        <div id="futureWeather">
-            <h3>5-Day Forecast</h3>
-            <div class="dayBox" id="day1"></div>
-            <div class="dayBox" id="day2"></div>
-            <div class="dayBox" id="day3"></div>
-            <div class="dayBox" id="day4"></div>
-            <div class="dayBox" id="day5"></div>
+        <div id="rightColumn">
+            <div id="currentWeather">
+                <!-- Current Weather will be populated here -->
+            </div>
+            <div id="futureWeather">
+                <!-- 5-Day Forecast will be populated here -->
+            </div>
         </div>
-    <script src="./assets/js/script.js"></script>
+    </div>
 </body>
 </html>
