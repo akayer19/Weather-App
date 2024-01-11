@@ -6,6 +6,8 @@ Below the current weather, the app also displays a 5-day weather forecast. This 
 
 Additionally, the app maintains a search history for easy access to previously searched cities. Each city in the search history can be clicked to quickly re-fetch and display the weather data for that location.
 
+View it here - https://akayer19.github.io/Weather-App/
+
 Screenshot:
 
 ![Screenshot](./assets/Screenshot/Landing.png)
